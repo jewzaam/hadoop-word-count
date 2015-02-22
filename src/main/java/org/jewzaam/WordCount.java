@@ -50,7 +50,7 @@ public class WordCount {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
 
-        Job job = new Job(conf, "wordcount");
+        Job job = Job.getInstance(conf, "wordcount");
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
@@ -64,6 +64,8 @@ public class WordCount {
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
+        job.setJarByClass(WordCount.class);
+        
         job.waitForCompletion(true);
     }
 
