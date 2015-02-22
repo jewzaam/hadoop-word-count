@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from threading import Thread
+import argparse
 import sys
 import logging
 import os.path
@@ -10,6 +11,15 @@ import urllib2
 
 threads = []
 running = True
+
+parser = argparse.ArgumentParser(description='My description')
+parser.add_argument('min', metavar='0', type=int, help='minimum range value, not inclusive')
+parser.add_argument('max', metavar='400000', type=int, help='maximum range value, inclusive')
+parser.add_argument('--output', dest='output', default='data', help='output directory')
+parser.add_argument('--threads', dest='threads', default=10, help='number of threads', type=int)
+parser.add_argument('--logdir', dest='logdir', default='./', help='directory used for logging')
+
+args = parser.parse_args()
 
 def create_thread(id_start, id_end):
     logging.debug('create_thread(%s, %s)', id_start, id_end)
@@ -23,7 +33,7 @@ def do_scrape(id_start, id_end):
     for x in range(int(id_start), int(id_end) + 1):
         if not running:
             break
-        filename = "data/{}".format(x)
+        filename = "{}/{}".format(args.output, x)
         if os.path.isfile(filename):
             logging.debug('%s: data exists', x)
         else:
@@ -40,29 +50,37 @@ def do_scrape(id_start, id_end):
             except urllib2.URLError as e:
                 logging.error('%s: URLError - %s', x, e.reason)
 
-# create data and target dir if it doesn't exist
-if not os.path.exists("target"):
-    os.makedirs("target")
+# create output dir if it doesn't exist
+if not os.path.exists(args.output):
+    os.makedirs(args.output)
 
-if not os.path.exists("data"):
-    os.makedirs("data")
+log_dir = args.logdir
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
 
 # setup logging
-logging.basicConfig(format='time="%(asctime)s" level="%(levelname)s" message="%(message)s"', level=logging.DEBUG, filename='target/scrape.log')
+logging.basicConfig(format='time="%(asctime)s" level="%(levelname)s" message="%(message)s"', level=logging.DEBUG, filename='{}/scrape.log'.format(log_dir))
 logging.info('START')
 
 # setup range
-# note, argv[0] is program name
 # first index is not inclusive
-if len(sys.argv) == 3:
-    thread_ranges = [int(sys.argv[1]), int(sys.argv[2])]
-else:
-    thread_ranges = [0, 400000]
+#thread_ranges = [args['min'], args['max']]
+thread_ranges = [args.min, args.max]
 
 print "Using ID range: [{}, {}]".format(thread_ranges[0], thread_ranges[1])
 
-thread_count = 10
+thread_count = args.threads
 total = thread_ranges[1] - thread_ranges[0]
+
+# if thread count is less than 1, reset to 1
+if thread_count < 1:
+    thread_count = 1
+
+# if thread count is bigger than total, reset thread count
+if thread_count > total:
+    thread_count = total
+
 thread_range = math.floor(total / thread_count)
 
 for x in range(thread_count):

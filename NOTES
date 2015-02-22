@@ -35,7 +35,7 @@ git commit -am "Initial commit"
 # create src/main/java/org/jewzaam/WordCount.java
 # add dependencies
 ```xml
-        <dependency>
+        <dependency>vi 
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-mapreduce-client-core</artifactId>
             <version>2.6.0</version>
@@ -47,5 +47,5 @@ git commit -am "Initial commit"
         </dependency>
 ```
 mvn clean install
-./scrape-wake-gov-realestate.py 0 100
-hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ./data/ usa/nc/wake/realestate/home/count
+./scrape-wake-gov-realestate.py 0 100 --output target/input/usa/nc/wake/realestate/home --threads 100 --logdir target
+hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ./target/input/usa/nc/wake/realestate/home/ ./target/output/usa/nc/wake/realestate/home/count
