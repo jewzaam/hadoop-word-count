@@ -51,3 +51,12 @@ hadoop jar ./target/hadoop-word-count*.jar org.jewzaam.WordCount \
     ./target/input/usa/nc/wake/realestate/home/ \
     ./target/output/usa/nc/wake/realestate/home/count
 ```
+
+## load data to hdfs
+This just makes a dir and copies the data into that directory.  Adding since there was some notes somewhere about MR needing to have source data in HDFS.  I haven't seen this to be true though..
+```
+hadoop dfs -mkdir -p usa/nc/wake/realestate/home/count
+hadoop dfs -copyFromLocal ./target/input/usa/nc/wake/realestate/home/ usa/nc/wake/realestate/home
+hadoop dfs -copyFromLocal ./target/output/usa/nc/wake/realestate/home/count usa/nc/wake/realestate/home/count
+```
+
