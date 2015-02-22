@@ -11,8 +11,8 @@
 # Things I've Done
 
 ## setup single cluster hadoop
-http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
-http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation
+[Single Node Cluster Setup](http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html)
+* [Standalone Operation](http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation)
 
 ## create project
 ```
@@ -44,6 +44,9 @@ From http://hortonworks.com/hadoop-tutorial/introducing-apache-hadoop-developers
 ## build, scrape, MR
 ```
 mvn clean install
-./scrape-wake-gov-realestate.py 0 100 --output target/input/usa/nc/wake/realestate/home --threads 100 --logdir target
-hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ./target/input/usa/nc/wake/realestate/home/ ./target/output/usa/nc/wake/realestate/home/count
+./scrape-wake-gov-realestate.py 0 100 --threads 100 --logdir target \
+    --output target/input/usa/nc/wake/realestate/home
+hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount \
+    ./target/input/usa/nc/wake/realestate/home/ \
+    ./target/output/usa/nc/wake/realestate/home/count
 ```
