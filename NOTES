@@ -47,4 +47,5 @@ git commit -am "Initial commit"
         </dependency>
 ```
 mvn clean install
-hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ~/source/python-multithread/data usa/nc/wake/realestate/home/count
+./scrape-wake-gov-realestate.py 0 100
+hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ./data/ usa/nc/wake/realestate/home/count
