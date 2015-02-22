@@ -35,8 +35,13 @@ def do_scrape(id_start, id_end):
             except urllib2.URLError as e:
                 logging.error('%s: URLError - %s', x, e.reason)
 
+# setup logging
 logging.basicConfig(format='time="%(asctime)s" level="%(levelname)s" message="%(message)s"', level=logging.DEBUG, filename='scrape.log')
 logging.info('START')
+
+# create data dir if it doesn't exist
+if not os.path.exists("data"):
+    os.makedirs("data")
 
 thread_count = 100
 # first index is not inclusive
