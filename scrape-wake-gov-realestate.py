@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from threading import Thread
+import progressbar
 import argparse
 import sys
 import logging
@@ -11,6 +12,7 @@ import urllib2
 
 threads = []
 running = True
+progressCount = 0
 
 parser = argparse.ArgumentParser(description='My description')
 parser.add_argument('min', metavar='0', type=int, help='minimum range value, not inclusive')
@@ -28,6 +30,7 @@ def create_thread(id_start, id_end):
 
 # Define a function for the thread
 def do_scrape(id_start, id_end):
+    global progressCount 
     logging.debug('do_scrape(%s, %s)', id_start, id_end)
     # end of range is not inclusive
     for x in range(int(id_start), int(id_end) + 1):
@@ -49,6 +52,13 @@ def do_scrape(id_start, id_end):
                 logging.error('%s: HTTPError - [%s] %s', x, e.code, e.reason)
             except urllib2.URLError as e:
                 logging.error('%s: URLError - %s', x, e.reason)
+        progressCount += 1
+
+def do_progress():
+    progressTotal = 100
+    progressCurrent = (progressTotal * progressCount / (thread_ranges[1] - thread_ranges[0]))
+    sys.stdout.write("\r[" + "=" * progressCurrent + " " * (progressTotal - progressCurrent) + "] " + str(int(100 * progressCurrent / progressTotal)) + "%")
+    sys.stdout.flush()
 
 # create output dir if it doesn't exist
 if not os.path.exists(args.output):
@@ -69,6 +79,7 @@ logging.info('START')
 thread_ranges = [args.min, args.max]
 
 print "Using ID range: [{}, {}]".format(thread_ranges[0], thread_ranges[1])
+
 
 thread_count = args.threads
 total = thread_ranges[1] - thread_ranges[0]
@@ -96,7 +107,8 @@ if max_range < thread_ranges[1]:
 while len(threads) > 0:
     try:
         for x in threads:
-            x.join(100)
+            do_progress()
+            x.join(0.1) # 0.1 seconds
             if not x.is_alive():
                 logging.info('THREAD CLOSED: %s', x.ident)
                 threads.remove(x)
@@ -104,5 +116,9 @@ while len(threads) > 0:
         print "Program will exist in a moment..."
         running = False
         break
+
+progressCount = thread_ranges[1] - thread_ranges[0]
+do_progress()
+sys.stdout.write('\n')
 
 logging.info('END')
