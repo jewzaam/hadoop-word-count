@@ -16,7 +16,8 @@
 
 ## create project
 ```
-mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=org.jewzaam -DartifactId=hadoop-word-count
+mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes \
+    -DgroupId=org.jewzaam -DartifactId=hadoop-word-count
 cd hadoop-word-count
 rm -f `find -name *.java`
 git init
@@ -46,7 +47,7 @@ From http://hortonworks.com/hadoop-tutorial/introducing-apache-hadoop-developers
 mvn clean install
 ./scrape-wake-gov-realestate.py 0 100 --threads 100 --logdir target \
     --output target/input/usa/nc/wake/realestate/home
-hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount \
+hadoop jar ./target/hadoop-word-count*.jar org.jewzaam.WordCount \
     ./target/input/usa/nc/wake/realestate/home/ \
     ./target/output/usa/nc/wake/realestate/home/count
 ```
