@@ -54,7 +54,6 @@ logging.info('START')
 # setup range
 # note, argv[0] is program name
 # first index is not inclusive
-print sys.argv
 if len(sys.argv) == 3:
     thread_ranges = [int(sys.argv[1]), int(sys.argv[2])]
 else:
