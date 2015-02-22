@@ -20,6 +20,8 @@ parser.add_argument('max', metavar='400000', type=int, help='maximum range value
 parser.add_argument('--output', dest='output', default='data', help='output directory')
 parser.add_argument('--threads', dest='threads', default=10, help='number of threads', type=int)
 parser.add_argument('--logdir', dest='logdir', default='./', help='directory used for logging')
+parser.add_argument('--progress', dest='progress', default='100', help='number of ticks on a proress bar to display', type=int)
+parser.add_argument('--quiet', dest='quiet', help='if set will not show a progress bar', action='store_true')
 
 args = parser.parse_args()
 
@@ -55,9 +57,15 @@ def do_scrape(id_start, id_end):
         progressCount += 1
 
 def do_progress():
-    progressTotal = 100
-    progressCurrent = (progressTotal * progressCount / (thread_ranges[1] - thread_ranges[0]))
-    sys.stdout.write("\r[" + "=" * progressCurrent + " " * (progressTotal - progressCurrent) + "] " + str(int(100 * progressCurrent / progressTotal)) + "%")
+    if args.quiet:
+        return
+    progressTotal = args.progress
+    progressPercent = (1000 * progressCount / (thread_ranges[1] - thread_ranges[0])) / 10.0
+    progressCurrent = int(progressPercent / 100 * progressTotal)
+    progressHalf = 0
+    if (progressPercent / 100.0 * progressTotal) - int(progressPercent / 100.0 * progressTotal) >= 0.5:
+        progressHalf = 1
+    sys.stdout.write("\r[" + "=" * progressCurrent + "-" * progressHalf + " " * (progressTotal - progressCurrent - progressHalf) + "] " + str(progressPercent) + "%")
     sys.stdout.flush()
 
 # create output dir if it doesn't exist
@@ -77,10 +85,6 @@ logging.info('START')
 # first index is not inclusive
 #thread_ranges = [args['min'], args['max']]
 thread_ranges = [args.min, args.max]
-
-print "Using ID range: [{}, {}]".format(thread_ranges[0], thread_ranges[1])
-
-
 thread_count = args.threads
 total = thread_ranges[1] - thread_ranges[0]
 
@@ -117,8 +121,10 @@ while len(threads) > 0:
         running = False
         break
 
-progressCount = thread_ranges[1] - thread_ranges[0]
-do_progress()
-sys.stdout.write('\n')
+if len(threads) == 0:
+    # exited normally, threads all done. close out progress bar
+    progressCount = thread_ranges[1] - thread_ranges[0]
+    do_progress()
+    sys.stdout.write('\n')
 
 logging.info('END')
