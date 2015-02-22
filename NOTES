@@ -1,0 +1,50 @@
+GOALS
+1) make wake county realestate data available in hdfs
+2) batch process (MR) the data in some dummy way (word count?)
+3) extract meaningful data (MR)
+4) make it real time
+
+QUESTIONS
+- How do changes to a file get into HDFS?
+- For files that change over time, how does the delta get processed without reprocessing the full source?
+
+
+
+# setup single cluster hadoop
+http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html
+http://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Standalone_Operation
+
+# collect some data
+cd ~/source/python-multithread/
+mkdir data
+./scrape-wake-gov-realestate.py
+
+# load data into hdfs
+cd ~/hadoop/hadoop-2.6.0
+bin/hadoop dfs -mkdir -p usa/nc/wake/realestate/home
+bin/hadoop dfs -copyFromLocal ~/source/python-multithread/data/ usa/nc/wake/realestate/home
+
+# create map reduce based on example here: http://hortonworks.com/hadoop-tutorial/introducing-apache-hadoop-developers/
+cd ~/source
+mvn -B archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=org.jewzaam -DartifactId=hadoop-word-count
+cd hadoop-word-count
+rm -f `find -name *.java`
+git init
+git add .
+git commit -am "Initial commit"
+# create src/main/java/org/jewzaam/WordCount.java
+# add dependencies
+```xml
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-mapreduce-client-core</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-core</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+```
+mvn clean install
+hadoop jar ./target/hadoop-word-count-1.0-SNAPSHOT.jar org.jewzaam.WordCount ~/source/python-multithread/data usa/nc/wake/realestate/home/count
