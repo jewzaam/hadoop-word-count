@@ -54,7 +54,7 @@ def do_scrape(id_start, id_end):
                 logging.error('%s: HTTPError - [%s] %s', x, e.code, e.reason)
             except urllib2.URLError as e:
                 logging.error('%s: URLError - %s', x, e.reason)
-            except IncompleteRead as e:
+            except httplib.IncompleteRead as e:
                 logging.error('%s: IncompleteRead', x)
         progressCount += 1
 
